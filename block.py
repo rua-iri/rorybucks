@@ -17,6 +17,7 @@ class Block:
 
     
     #function to calculate the hash for the next block
+    @property
     def calcHash(self):
         totalStr = "{}{}{}{}{}".format(self.index, self.proof, self.prevHash, self.transaction, self.tmeStamp)
         return hashlib.sha256(totalStr.encode())

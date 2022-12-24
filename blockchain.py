@@ -41,6 +41,7 @@ class Blockchain:
 
 
     #check that each block correctly points to the previous block's hash
+    @staticmethod
     def checkValid(bloc, prevBloc):
         
         if prevBloc.index+1 != bloc.index:
@@ -56,7 +57,6 @@ class Blockchain:
 
 
     #function to add a new transaction to the chain
-    @staticmethod
     def addTransaction(self, sendr, receiver, amount):
         transact = transaction.Transaction(sendr, receiver, amount)
         self.currentTransactions.append(transact)
@@ -89,5 +89,6 @@ class Blockchain:
 
 
     #return the most recent block in the chain
+    @property
     def lastBlock(self):
         return self.chain[-1]
