@@ -1,4 +1,6 @@
+import hashlib
 import block
+import transaction
 
 
 class Blockchain:
@@ -45,7 +47,7 @@ class Blockchain:
             return False
         elif prevBloc.calcHash != bloc.calcHash:
             return False
-        elif not Blockchain.verifyProof(bloc.proof, prevBloc.proof):
+        elif not Blockchain.verifyProof(prevBloc.proof, bloc.proof):
             return False
         elif bloc.tmeStamp <= prevBloc.tmeStamp:
             return False
@@ -53,5 +55,39 @@ class Blockchain:
         return True
 
 
+    #function to add a new transaction to the chain
+    @staticmethod
+    def addTransaction(self, sendr, receiver, amount):
+        transact = transaction.Transaction(sendr, receiver, amount)
+        self.currentTransactions.append(transact)
+
+        return True
 
 
+
+    @staticmethod
+    def proofOfWork(prevProof):
+        proofNum = 0
+
+        #increment proofNum until verifyProof returns True
+        while Blockchain.verifyProof(prevProof, proofNum) is False:
+            proofNum+=1
+        
+        return proofNum
+
+
+
+    #determine if proof is valid
+    @staticmethod
+    def verifyProof(prevProof, proof):
+        guess = f'{prevProof}{proof}'.encode()
+        guessHash = hashlib.sha256(guess).hexdigest()
+
+        #return true if first four chars are 0000
+        return guessHash[:4] == "0000"
+
+
+
+    #return the most recent block in the chain
+    def lastBlock(self):
+        return self.chain[-1]
