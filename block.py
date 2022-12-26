@@ -20,6 +20,8 @@ class Block:
     @property
     def calcHash(self):
         totalStr = "{}{}{}{}{}".format(self.index, self.proof, self.prevHash, self.transaction, self.tmeStamp)
+
+        #return hash of all elements concatenated
         return hashlib.sha256(totalStr.encode())
 
     
