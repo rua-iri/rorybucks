@@ -15,7 +15,7 @@ class Table():
                 createData += "%s varchar(100)," %clmn
  
             cur =  app.mySql.connection.cursor()
-            cur.execute("CREATE TABLE %s%s" %(self.table, self.columns))
+            cur.execute("CREATE TABLE %s(%s)" %(self.table, createData[:len(createData)-1]))
             cur.close()
 
 
@@ -26,18 +26,45 @@ class Table():
         return data
 
     def getOne(self, search, value):
-        pass
+        data = {}
+        cur = app.mySql.connection.cursor()
+        result = cur.execute("SELECT * FROM %s WHERE %s = \"%s\"" %(self.table, search, value))
+
+        if result>0:
+            data = cur.fetchone()
+
+        cur.close()
+        return data
 
     def deleteOne(self, search, value):
-        pass
+        cur = app.mySql.connection.cursor()
+        cur.execute("DELETE FROM %s WHERE %s = \"%s\"" %(self.table, search, value))
+        app.mySql.connection.commit()
+        cur.close()
+    
+    def deleteAll(self):
+        self.drop()
 
     def drop(self):
-        pass
+        cur = app.mySql.connection.cursor()
 
     def insert(self, *args):
-        pass
+        data = ""
+        
+        for arg in args:
+            data += "\"%s\"," %(arg)
+
+        cur = app.mySql.connection.cursor()
+        cur.execute("INSERT INTO %s%s VALUES(%s)" %(self.table, self.columns, data[:len(data)-1]))
+        app.mySql.connection.commit()
+        cur.close()
 
 
+def sqlRaw(execution):
+    cur = app.mySql.connection.cursor()
+    cur.execute(execution)
+    app.mySql.connection.commit()
+    cur.close()
 
 
 def isNewTable(tableName):
@@ -52,5 +79,13 @@ def isNewTable(tableName):
 
     else:
         return False
+
+
+def isNewUser(username):
+    users = Table("users", "name", "email", "username", "password")
+    data = users.getAll()
+    usernames = [user.get("username") for user in data]
+
+    return False if username in usernames else True
 
     
