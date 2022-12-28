@@ -10,9 +10,23 @@
 
     <h1>Register</h1>
 
-    <form action="">
-        <input type="text">
-        <input type="text">
+    <form action="" method="POST">
+        <label for="">Full Name</label>
+        <input type="text" value={{request.form.name}}>
+
+        <label for="">Username</label>
+        <input type="text" value={{request.form.username}}>
+
+
+        <label for="">Email</label>
+        <input type="text" value={{request.form.email}}>
+
+        <label for="">Password</label>
+        <input type="password" value={{request.form.password}}>
+
+        <label for="">Confirm Password</label>
+        <input type="password" value={{request.form.confirm}}>
+
         <input type="submit">
     </form>
     

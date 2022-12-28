@@ -3,7 +3,7 @@ import app
 
 class Table():
     
-    def __init(self, tableName, *args):
+    def __init__(self, tableName, *args):
         self.table = tableName
         self.columns = "(%s)" %",".join(args)
         self.columnsList = args
@@ -15,6 +15,7 @@ class Table():
                 createData += "%s varchar(100)," %clmn
  
             cur =  app.mySql.connection.cursor()
+            print("CREATE TABLE %s(%s)" %(self.table, createData[:len(createData)-1]))
             cur.execute("CREATE TABLE %s(%s)" %(self.table, createData[:len(createData)-1]))
             cur.close()
 
