@@ -1,6 +1,7 @@
 import flask
 from passlib import hash
 import flask_mysqldb
+import functools
 
 import secretstuff
 import sqlhelpers
@@ -16,6 +17,16 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 
 mySql = flask_mysqldb.MySQL(app)
+
+
+def isLoggedIn(f):
+    @functools.wraps(f)
+    def wrap(*args, **kwargs):
+        if "loggedIn" in flask.session:
+            return f(*args, *kwargs)
+        else:
+            flask.flash("Unauthorized, please log in", "danger")
+    return wrap
 
 
 def logInUser(username):
@@ -99,14 +110,17 @@ def logout():
 
 
 @app.route("/dashboard")
+@isLoggedIn
 def dashboard():
     return flask.render_template("dashboard.html", session=flask.session)
+
 
 
 
 @app.route("/")
 def index():
     return flask.render_template("index.html")
+
 
 
 if __name__=="__main__":
