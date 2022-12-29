@@ -21,7 +21,7 @@ class Table():
 
 
     def getAll(self):
-        cur = app.mySql.cursor()
+        cur = app.mySql.connection.cursor()
         res = cur.execute("SELECT * FROM %s" %self.table)
         data = cur.fetchall()
         return data

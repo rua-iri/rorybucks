@@ -17,12 +17,17 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mySql = flask_mysqldb.MySQL(app)
 
+
+def logInUser(username):
+    pass
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     form = forms.RegisterForm(flask.request.form)
     users = sqlhelpers.Table("users", "name", "username", "email", "password")
 
     print(form.validate())
+
 
     #if form is submitted
     if flask.request.method == 'POST' and form.validate():
@@ -31,22 +36,23 @@ def register():
         email = form.email.data
         name = form.name.data
 
-        print(username)
-        print(email)
-        print(name)
 
         #make sure user does not already exist
-        if True:
+        if sqlhelpers.isNewUser(username):
             #add the user to mysql and log them in
             password = hash.sha256_crypt.encrypt(form.password.data)
-            users.insert(name,email,username,password)
-            # log_in_user(username)
-            return flask.redirect("https://www.google.com")
+            users.insert(name, username, email, password)
+            # logInUser(username)
+            return flask.redirect(flask.url_for("dashboard"))
         else:
             flask.flash('User already exists', 'danger')
             return flask.redirect(flask.url_for('register'))
 
     return flask.render_template('register.html', form=form)
+
+@app.route("/dashboard")
+def dashboard():
+    return flask.render_template("dashboard.html")
 
 
 @app.route("/")
