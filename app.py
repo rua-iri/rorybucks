@@ -19,7 +19,16 @@ mySql = flask_mysqldb.MySQL(app)
 
 
 def logInUser(username):
-    pass
+    users = sqlhelpers.Table("users", "name", "username", "email", "password")
+    userData = users.getOne("username", username)
+    flask.session["loggedIn"] = True
+    flask.session["uName"] = username
+    flask.session["name"] = userData.get("name")
+    flask.session["email"] = userData.get("email")
+
+
+
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -42,7 +51,7 @@ def register():
             #add the user to mysql and log them in
             password = hash.sha256_crypt.encrypt(form.password.data)
             users.insert(name, username, email, password)
-            # logInUser(username)
+            logInUser(username)
             return flask.redirect(flask.url_for("dashboard"))
         else:
             flask.flash('User already exists', 'danger')
@@ -50,9 +59,49 @@ def register():
 
     return flask.render_template('register.html', form=form)
 
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if flask.request.method=="POST":
+        username = flask.request.form["username"]
+        password = flask.request.form["password"]
+
+        users = sqlhelpers.Table("users", "name", "username", "email", "password")
+        usr = users.getOne("username", username)
+        hshPassword = usr.get("password")
+
+        if hshPassword is None:
+            flask.flash("User not found", "danger")
+            return flask.redirect(flask.url_for("login"))
+        else:
+            if hshPassword==hash.sha256_crypt.encrypt(password):
+                logInUser(username)
+                flask.flash("Login Successful", "success")
+                return flask.redirect(flask.url_for("dashboard"))
+            else:
+                flask.flash("Error: Password Invalid", "danger")
+                return flask.redirect(flask.url_for("login"))
+
+
+    return flask.render_template("login.html")
+
+
+
+@app.route("/logout")
+def logout():
+    flask.session.clear()
+    flask.flash("Logout Sucessful", "success")
+    return flask.redirect(flask.url_for("index"))
+
+
+
+
 @app.route("/dashboard")
 def dashboard():
-    return flask.render_template("dashboard.html")
+    return flask.render_template("dashboard.html", session=flask.session)
+
 
 
 @app.route("/")
@@ -61,6 +110,7 @@ def index():
 
 
 if __name__=="__main__":
+    app.secret_key = secretstuff.SecretStuff.secretKey
     app.run(debug=True)
 
 
