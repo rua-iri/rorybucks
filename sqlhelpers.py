@@ -1,4 +1,6 @@
 import app
+import block
+import blockchain
 
 
 class Table():
@@ -89,4 +91,10 @@ def isNewUser(username):
 
     return False if username in usernames else True
 
-    
+
+def getBlockchain():
+    bChain = blockchain.Blockchain()
+    bChainSql = Table("blockchain", "number", "hash", "previous", "data", "nonce")
+
+    for blk in bChainSql.getAll():
+        bChain.makeBlock(block.Block)
