@@ -47,6 +47,7 @@ class Table():
     
     def deleteAll(self):
         self.drop()
+        self.__init__(self.table, *self.columnsList)
 
     def drop(self):
         cur = app.mySql.connection.cursor()
@@ -97,4 +98,16 @@ def getBlockchain():
     bChainSql = Table("blockchain", "number", "hash", "previous", "data", "nonce")
 
     for blk in bChainSql.getAll():
-        bChain.makeBlock(block.Block)
+        bChain.makeBlock(blk.get("previous"), blk.get("nonce"))
+
+
+def syncBlockchain(bChain):
+    bChainSql = Table("blockchain", "number", "hash", "previous", "data", "nonce")
+    bChainSql.deleteAll()
+
+    for blck in bChain:
+        bChainSql.insert(str(blck.index), blck.calcHash(), blck.prevHash, blck.transaction)
+        
+
+
+
