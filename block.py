@@ -22,9 +22,11 @@ class Block:
         totalStr = "{}{}{}{}{}".format(self.index, self.proof, self.prevHash, self.transaction, self.tmeStamp)
 
         #return hash of all elements concatenated
-        return hashlib.sha256(totalStr.encode())
+        return hashlib.sha256(totalStr.encode()).hexdigest()
 
     
     def __repr__(self):
         blockString = "{} - {} - {} - {} - {}".format(self.index, self.proof, self.prevHash, self.transaction, self.tmeStamp)
         return blockString
+
+        

@@ -119,6 +119,7 @@ def dashboard():
 
 @app.route("/")
 def index():
+    sqlhelpers.testBlockchain()
     return flask.render_template("index.html")
 
 

@@ -3,6 +3,13 @@ import block
 import blockchain
 
 
+class InvalidTransactionError(Exception):
+    pass
+
+class InsufficientFundsException(Exception):
+    pass
+
+
 class Table():
     
     def __init__(self, tableName, *args):
@@ -85,12 +92,50 @@ def isNewTable(tableName):
         return False
 
 
+
 def isNewUser(username):
     users = Table("users", "name", "email", "username", "password")
     data = users.getAll()
     usernames = [user.get("username") for user in data]
 
     return False if username in usernames else True
+
+
+
+def sendBucks(sendr, receivr, amount):
+
+    #check that amount is sufficient
+    try:
+        amount = float(amount)
+    except:
+        raise InvalidTransactionError("Invalid Transaction")
+    
+
+    if amount > getBalance() and sendr!="THEBOSS":
+        raise InsufficientFundsException("Insufficient Funds")
+    elif sendr==receivr or amount<=0:
+        raise InvalidTransactionError("Invalid Transaction")
+    elif isNewUser(receivr):
+        raise InvalidTransactionError("User Does Not Exist")
+
+
+    #if valid, add transaction to blockchain
+    bChain = getBlockchain()
+
+    lBlock = bChain.lastBlock
+    lProof = lBlock.proof
+    proofNum = bChain.proofOfWork(lProof)
+    bChain.addTransaction(sendr, receivr, amount)
+    lHash = lBlock.calcHash
+    bChain.makeBlock(proofNum, lHash)
+
+
+
+
+def getBalance():
+    balan = 0.00
+    bChain = getBlockchain()
+
 
 
 def getBlockchain():
@@ -105,8 +150,11 @@ def syncBlockchain(bChain):
     bChainSql = Table("blockchain", "number", "hash", "previous", "data", "nonce")
     bChainSql.deleteAll()
 
-    for blck in bChain:
-        bChainSql.insert(str(blck.index), blck.calcHash(), blck.prevHash, blck.transaction)
+    for blck in bChain.chain:
+        if blck.index>0:
+            bChainSql.insert(str(blck.index), blck.calcHash, blck.prevHash, blck.transaction[0].toString(), blck.proof)
+        else:
+            bChainSql.insert(str(blck.index), blck.calcHash, blck.prevHash, blck.transaction, blck.proof)
         
 
 
