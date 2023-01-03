@@ -1,5 +1,4 @@
 import app
-import block
 import blockchain
 
 
@@ -92,9 +91,8 @@ def isNewTable(tableName):
         return False
 
 
-
 def isNewUser(username):
-    users = Table("users", "name", "email", "username", "password")
+    users = Table("users", "user_id", "name", "username", "email", "password", "balance")
     data = users.getAll()
     usernames = [user.get("username") for user in data]
 
@@ -119,6 +117,7 @@ def sendBucks(sendr, receivr, amount):
         raise InvalidTransactionError("User Does Not Exist")
 
 
+
     #if valid, add transaction to blockchain
     bChain = getBlockchain()
 
@@ -138,20 +137,27 @@ def getBalance():
 
 
 
+
 def getBlockchain():
     bChain = blockchain.Blockchain()
-    bChainSql = Table("blockchain", "number", "hash", "previous", "data", "nonce")
+    bChainSql = Table("blockchain", "blockid", "hash", "prev_hash", "transaction_id", "proof")
 
     for blk in bChainSql.getAll():
-        bChain.makeBlock(blk.get("previous"), blk.get("nonce"))
+        bChain.makeBlock(blk.get("prev_hash"), blk.get("proof"))
+
 
 
 def syncBlockchain(bChain):
-    bChainSql = Table("blockchain", "number", "hash", "previous", "data", "nonce")
+    bChainSql = Table("blockchain", "blockid", "hash", "prev_hash", "transaction_id", "proof")
     bChainSql.deleteAll()
+    transactionSql = Table("transactions", "transaction_id", "sender", "recipient", "amount")
 
+    #iterate through each block in the chain
     for blck in bChain.chain:
+
+        #alter insertion slightly only for the genesis block
         if blck.index>0:
+            transactionSql.insert("", blck.transaction[0].sender, blck.transaction[0].recipient, blck.transaction[0].quantity)
             bChainSql.insert(str(blck.index), blck.calcHash, blck.prevHash, blck.transaction[0].toString(), blck.proof)
         else:
             bChainSql.insert(str(blck.index), blck.calcHash, blck.prevHash, blck.transaction, blck.proof)

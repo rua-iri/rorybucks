@@ -30,7 +30,7 @@ def isLoggedIn(f):
 
 
 def logInUser(username):
-    users = sqlhelpers.Table("users", "name", "username", "email", "password")
+    users = sqlhelpers.Table("users", "user_id", "name", "username", "email", "password", "balance")
     userData = users.getOne("username", username)
     flask.session["loggedIn"] = True
     flask.session["uName"] = username
@@ -44,18 +44,18 @@ def logInUser(username):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     form = forms.RegisterForm(flask.request.form)
-    users = sqlhelpers.Table("users", "name", "username", "email", "password")
+    users = sqlhelpers.Table("users", "user_id", "name", "username", "email", "password", "balance")
 
     print(form.validate())
 
 
     #if form is submitted
     if flask.request.method == 'POST' and form.validate():
+
         #collect form data
         username = form.username.data
         email = form.email.data
         name = form.name.data
-
 
         #make sure user does not already exist
         if sqlhelpers.isNewUser(username):
@@ -79,7 +79,7 @@ def login():
         username = flask.request.form["username"]
         password = flask.request.form["password"]
 
-        users = sqlhelpers.Table("users", "name", "username", "email", "password")
+        users = sqlhelpers.Table("users", "user_id", "name", "username", "email", "password", "balance")
         usr = users.getOne("username", username)
         hshPassword = usr.get("password")
 
