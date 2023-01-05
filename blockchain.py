@@ -17,7 +17,8 @@ class Blockchain:
 
     #function to create the genesis block in the chain
     def makeGenesis(self):
-        self.addTransaction(0, 0, 0)
+        #TODO if the owner/bank name ever changes then change these variables
+        self.addTransaction("THEBOSS", "THEBOSS", 0)
         self.makeBlock(proof=0, prevHash=0)
 
 

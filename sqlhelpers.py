@@ -1,5 +1,6 @@
 import app
 import blockchain
+import sqlqueries
 
 
 class InvalidTransactionError(Exception):
@@ -18,13 +19,20 @@ class Table():
 
         if isNewTable(tableName):
             createData = ""
+            createStatement = ""
 
-            for clmn in self.columnsList:
-                createData += "%s varchar(100)," %clmn
+            if self.table=="blockchain":
+                createStatement = sqlqueries.createBlockchain
+            elif self.table=="transactions":
+                createStatement = sqlqueries.createTransactions
+            elif self.table=="users":
+                #TODO add create users query
+                createStatement = ""
+            
+
  
             cur =  app.mySql.connection.cursor()
-            print("CREATE TABLE %s(%s)" %(self.table, createData[:len(createData)-1]))
-            cur.execute("CREATE TABLE %s(%s)" %(self.table, createData[:len(createData)-1]))
+            cur.execute(createStatement)
             cur.close()
 
 
@@ -64,6 +72,10 @@ class Table():
 
     def drop(self):
         cur = app.mySql.connection.cursor()
+        cur.execute("SET foreign_key_checks = 0;")
+        cur.execute("DROP TABLE %s" %self.table)
+        cur.execute("SET foreign_key_checks = 1;")
+        cur.close()
 
     def insert(self, *args):
         data = ""
@@ -146,6 +158,9 @@ def sendBucks(sendr, receivr, amount):
     lHash = lBlock.calcHash
     bChain.makeBlock(proofNum, lHash)
 
+    for blk in bChain.chain:
+        print(blk)
+
     syncBlockchain(bChain)
 
 
@@ -176,18 +191,21 @@ def getBlockchain():
 
 def syncBlockchain(bChain):
     bChainSql = Table("blockchain", "block_id", "hash", "prev_hash", "transaction_id", "proof")
-    bChainSql.deleteAll()
+    # bChainSql.deleteAll()
     transactionSql = Table("transactions", "transaction_id", "sender", "recipient", "amount")
+    # transactionSql.deleteAll()
     userSql = Table("users", "user_id", "name", "username", "email", "password", "balance")
 
 
     #iterate through each block in the chain
-    for blck in bChain.chain:        
+    for blck in bChain.chain:
+
+        print(blck.index)
+        print(blck)
+        print(len(blck.transaction))
 
         #alter insertion slightly only for the genesis block
-        if blck.index>0:
-            print(blck.index)
-            print(blck.transaction)
+        if len(blck.transaction)>0:
 
             #get the user_id for the sender and recipient
             sendrUser = userSql.getOne("username", blck.transaction[0].sender)
@@ -200,7 +218,6 @@ def syncBlockchain(bChain):
             print(blck.transaction[0].recipient)
             print("\n\n")
 
-
             
             transactionSql.insert("null", senderId, recieveId, blck.transaction[0].quantity)
             transactionData = transactionSql.getLast("transaction_id")
@@ -209,7 +226,7 @@ def syncBlockchain(bChain):
             bChainSql.insert("null", blck.calcHash, blck.prevHash, transactionData.get("transaction_id"), blck.proof)
 
         else:
-            bChainSql.insert("null", blck.calcHash, blck.prevHash, 22, blck.proof)
+            bChainSql.insert("null", blck.calcHash, blck.prevHash, 1, blck.proof)
         
 
 
