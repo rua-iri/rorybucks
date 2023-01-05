@@ -45,6 +45,13 @@ class Table():
         cur.close()
         return data
 
+    def getLast(self, idName):
+        cur = app.mySql.connection.cursor()
+        res = cur.execute("SELECT * FROM %s ORDER BY %s DESC LIMIT 1" %(self.table, idName))
+        data = cur.fetchone()
+        return data
+
+
     def deleteOne(self, search, value):
         cur = app.mySql.connection.cursor()
         cur.execute("DELETE FROM %s WHERE %s = \"%s\"" %(self.table, search, value))
@@ -61,8 +68,17 @@ class Table():
     def insert(self, *args):
         data = ""
         
+        #Don't put quotation marks around null values
         for arg in args:
-            data += "\"%s\"," %(arg)
+            if arg=="null":
+                data += "%s," %(arg)
+            else:
+                data += "\"%s\"," %(arg)
+
+        #TODO remove this, just for testing
+        print("\n")
+        print(("INSERT INTO %s%s VALUES(%s)" %(self.table, self.columns, data[:len(data)-1])))
+        print("\n")
 
         cur = app.mySql.connection.cursor()
         cur.execute("INSERT INTO %s%s VALUES(%s)" %(self.table, self.columns, data[:len(data)-1]))
@@ -107,16 +123,18 @@ def sendBucks(sendr, receivr, amount):
         amount = float(amount)
     except:
         raise InvalidTransactionError("Invalid Transaction")
+
+    sendrBal = getBalance(sendr)
+    if sendrBal==None:
+        sendrBal = 0
     
 
-    if amount > getBalance() and sendr!="THEBOSS":
+    if amount > sendrBal and sendr!="THEBOSS":
         raise InsufficientFundsException("Insufficient Funds")
     elif sendr==receivr or amount<=0:
         raise InvalidTransactionError("Invalid Transaction")
     elif isNewUser(receivr):
         raise InvalidTransactionError("User Does Not Exist")
-
-
 
     #if valid, add transaction to blockchain
     bChain = getBlockchain()
@@ -128,39 +146,70 @@ def sendBucks(sendr, receivr, amount):
     lHash = lBlock.calcHash
     bChain.makeBlock(proofNum, lHash)
 
+    syncBlockchain(bChain)
 
 
 
-def getBalance():
-    balan = 0.00
-    bChain = getBlockchain()
 
+#function to check a user's balance in the db
+def getBalance(uName):
+
+    userSQL = Table("users", "user_id", "name", "username", "email", "password", "balance")
+    userToCheck = userSQL.getOne("username", uName)
+    userBal = userToCheck.get("balance")
+
+    return userBal
 
 
 
 def getBlockchain():
     bChain = blockchain.Blockchain()
-    bChainSql = Table("blockchain", "blockid", "hash", "prev_hash", "transaction_id", "proof")
+    bChainSql = Table("blockchain", "block_id", "hash", "prev_hash", "transaction_id", "proof")
 
     for blk in bChainSql.getAll():
         bChain.makeBlock(blk.get("prev_hash"), blk.get("proof"))
+    
+    return bChain
+
 
 
 
 def syncBlockchain(bChain):
-    bChainSql = Table("blockchain", "blockid", "hash", "prev_hash", "transaction_id", "proof")
+    bChainSql = Table("blockchain", "block_id", "hash", "prev_hash", "transaction_id", "proof")
     bChainSql.deleteAll()
     transactionSql = Table("transactions", "transaction_id", "sender", "recipient", "amount")
+    userSql = Table("users", "user_id", "name", "username", "email", "password", "balance")
+
 
     #iterate through each block in the chain
-    for blck in bChain.chain:
+    for blck in bChain.chain:        
 
         #alter insertion slightly only for the genesis block
         if blck.index>0:
-            transactionSql.insert("", blck.transaction[0].sender, blck.transaction[0].recipient, blck.transaction[0].quantity)
-            bChainSql.insert(str(blck.index), blck.calcHash, blck.prevHash, blck.transaction[0].toString(), blck.proof)
+            print(blck.index)
+            print(blck.transaction)
+
+            #get the user_id for the sender and recipient
+            sendrUser = userSql.getOne("username", blck.transaction[0].sender)
+            senderId = sendrUser.get("user_id")
+            receiveUser = userSql.getOne("username", blck.transaction[0].recipient)
+            recieveId = receiveUser.get("user_id")
+
+            print("\n\n")
+            print(blck.transaction[0].sender)
+            print(blck.transaction[0].recipient)
+            print("\n\n")
+
+
+            
+            transactionSql.insert("null", senderId, recieveId, blck.transaction[0].quantity)
+            transactionData = transactionSql.getLast("transaction_id")
+            print(transactionData)
+
+            bChainSql.insert("null", blck.calcHash, blck.prevHash, transactionData.get("transaction_id"), blck.proof)
+
         else:
-            bChainSql.insert(str(blck.index), blck.calcHash, blck.prevHash, blck.transaction, blck.proof)
+            bChainSql.insert("null", blck.calcHash, blck.prevHash, 22, blck.proof)
         
 
 

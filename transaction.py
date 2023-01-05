@@ -8,4 +8,4 @@ class Transaction:
         self.quantity = quantity
 
     def toString(self):
-        return self.sender + " -> " + self.recipient + " $" + str(self.quantity)
+        return str(self.sender) + " -> " + str(self.recipient) + " $" + str(self.quantity)

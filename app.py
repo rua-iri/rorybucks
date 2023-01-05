@@ -61,7 +61,7 @@ def register():
         if sqlhelpers.isNewUser(username):
             #add the user to mysql and log them in
             password = hash.sha256_crypt.encrypt(form.password.data)
-            users.insert(name, username, email, password)
+            users.insert("null", name, username, email, password, 0)
             logInUser(username)
             return flask.redirect(flask.url_for("dashboard"))
         else:
@@ -119,7 +119,7 @@ def dashboard():
 
 @app.route("/")
 def index():
-    sqlhelpers.testBlockchain()
+    sqlhelpers.sendBucks("THEBOSS", "someGuy123", 100)
     return flask.render_template("index.html")
 
 
