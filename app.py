@@ -33,7 +33,7 @@ def logInUser(username):
     users = sqlhelpers.Table("users", "user_id", "name", "username", "email", "password", "balance")
     userData = users.getOne("username", username)
     flask.session["loggedIn"] = True
-    flask.session["uName"] = username
+    flask.session["username"] = username
     flask.session["name"] = userData.get("name")
     flask.session["email"] = userData.get("email")
 
@@ -60,7 +60,7 @@ def register():
         #make sure user does not already exist
         if sqlhelpers.isNewUser(username):
             #add the user to mysql and log them in
-            password = hash.sha256_crypt.encrypt(form.password.data)
+            password = hash.sha256_crypt.hash(form.password.data)
             users.insert("null", name, username, email, password, 0)
             logInUser(username)
             return flask.redirect(flask.url_for("dashboard"))
@@ -75,7 +75,10 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
+
     if flask.request.method=="POST":
+
+
         username = flask.request.form["username"]
         password = flask.request.form["password"]
 
@@ -84,14 +87,17 @@ def login():
         hshPassword = usr.get("password")
 
         if hshPassword is None:
+            print("user does not exist")
             flask.flash("User not found", "danger")
             return flask.redirect(flask.url_for("login"))
         else:
-            if hshPassword==hash.sha256_crypt.encrypt(password):
+            if hash.sha256_crypt.verify(password, hshPassword):
+                print("login successful")
                 logInUser(username)
                 flask.flash("Login Successful", "success")
                 return flask.redirect(flask.url_for("dashboard"))
             else:
+                print("password invalid")
                 flask.flash("Error: Password Invalid", "danger")
                 return flask.redirect(flask.url_for("login"))
 
@@ -119,8 +125,20 @@ def dashboard():
 
 @app.route("/")
 def index():
-    sqlhelpers.sendBucks("THEBOSS", "someGuy123", 100)
     return flask.render_template("index.html")
+
+
+@app.route("/transaction")
+def transaction():
+    form = forms.SendMoneyForm(flask.request.form)
+    balance = sqlhelpers.getBalance(flask.session.get("username"))
+    print(flask.session.items())
+    print(balance)
+
+    if flask.request.method=="POST":
+        pass
+
+    return flask.render_template("transaction.html", balance=balance, form=form)
 
 
 

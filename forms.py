@@ -9,6 +9,12 @@ class RegisterForm(wtforms.Form):
     confirm = wtforms.PasswordField("Confirm Password")
 
 
+class SendMoneyForm(wtforms.Form):
+    username = wtforms.StringField("Username", [wtforms.validators.Length(min=4, max=25)])
+    amount = wtforms.StringField("Amount", [wtforms.validators.Length(min=1, max=50)])
+
+
+
 
 
 

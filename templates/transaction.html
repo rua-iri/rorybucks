@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoryBucks | Transaction</title>
+</head>
+
+<body>
+    {% include "includes/_messages.html" %}
+    <p>Your Current Balance is {{ balance }} RoryBucks</p>
+    {% from "includes/_formhelpers.html" import render_field %}
+
+    <form action="" method="POST">
+        <div>
+            {{render_field(form.username)}}
+        </div>
+
+        <div>
+            {{render_field(form.amount)}}
+        </div>
+
+        <div>
+            <input type="submit">
+        </div>
+
+    </form>
+
+    <button onclick="window.location.href='/dashboard'">
+        Dashboard
+    </button>
+
+</body>
+
+</html>
