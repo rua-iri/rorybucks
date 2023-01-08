@@ -22,15 +22,24 @@
         {% include "includes/_messages.html" %}
         <form action="" method="POST">
 
-            <label for="inputUsername">Username</label>
-            <input type="text" name="username" id="inputUsername">
+            <div class="my-3">
 
-            <label for="inputPassword">Password</label>
-            <input type="password" name="password" id="inputPassword">
+                <div class="py-2">
+                    <label for="inputUsername" class="form-label">Username</label>
+                    <input type="text" name="username" id="inputUsername" class="form-control">
+                </div>
+
+                <div class="py-2">
+                    <label for="inputPassword" class="form-label">Password</label>
+                    <input type="password" name="password" id="inputPassword" class="form-control">
+                </div>
+
+                <div class="pt-5">
+                    <input type="submit" value="Login" class="btn btn-success">
+                </div>
 
 
-            <input type="submit" value="Login">
-
+            </div>
 
         </form>
 
