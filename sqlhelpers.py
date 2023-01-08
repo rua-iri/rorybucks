@@ -137,6 +137,7 @@ def sendBucks(sendr, receivr, amount):
         raise InvalidTransactionError("Invalid Transaction")
 
     sendrBal = getBalance(sendr)
+    
     if sendrBal==None:
         sendrBal = 0
     
@@ -157,6 +158,8 @@ def sendBucks(sendr, receivr, amount):
     bChain.addTransaction(sendr, receivr, amount)
     lHash = lBlock.calcHash
     bChain.makeBlock(proofNum, lHash)
+
+    #TODO subtract amount sent from the sender's balance
 
     for blk in bChain.chain:
         print(blk)

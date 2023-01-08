@@ -136,7 +136,15 @@ def transaction():
     print(balance)
 
     if flask.request.method=="POST":
-        pass
+        try:
+            sqlhelpers.sendBucks(flask.session.get("username"), form.username.data, form.amount.data)
+            flask.flash("Money Sent!", "success")
+
+        except Exception as e:
+            flask.flash(str(e), "danger")
+        
+        return flask.redirect(flask.url_for("transaction"))
+
 
     return flask.render_template("transaction.html", balance=balance, form=form)
 

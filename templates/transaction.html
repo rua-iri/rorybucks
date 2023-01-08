@@ -6,32 +6,47 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RoryBucks | Transaction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 </head>
 
-<body>
-    {% include "includes/_messages.html" %}
-    <p>Your Current Balance is {{ balance }} RoryBucks</p>
-    {% from "includes/_formhelpers.html" import render_field %}
+<body class="bg-dark">
 
-    <form action="" method="POST">
-        <div>
-            {{render_field(form.username)}}
-        </div>
+    <div class="container bg-light pb-5 text-center">
 
-        <div>
-            {{render_field(form.amount)}}
-        </div>
 
-        <div>
-            <input type="submit">
-        </div>
+        {% include "includes/navbar.html" %}
 
-    </form>
+        
 
-    <button onclick="window.location.href='/dashboard'">
-        Dashboard
-    </button>
+        {% include "includes/_messages.html" %}
+        <p>Your Current Balance is {{ balance }} RoryBucks</p>
+        {% from "includes/_formhelpers.html" import render_field %}
 
+        <form action="" method="POST">
+            <div>
+                {{render_field(form.username)}}
+            </div>
+
+            <div>
+                {{render_field(form.amount)}}
+            </div>
+
+            <div>
+                <input type="submit">
+            </div>
+
+        </form>
+
+        <button onclick="window.location.href='/dashboard'">
+            Dashboard
+        </button>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
