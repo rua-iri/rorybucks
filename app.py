@@ -6,6 +6,7 @@ import functools
 import secretstuff
 import sqlhelpers
 import forms
+import cryptovalues
 
 app = flask.Flask(__name__)
 
@@ -155,3 +156,8 @@ if __name__=="__main__":
     app.run(debug=True)
 
 
+
+@app.route("/test")
+def test():
+    cryptovalues.getCryptoValues(secretstuff.SecretStuff.headers)
+    
