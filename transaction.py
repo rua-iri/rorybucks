@@ -7,5 +7,6 @@ class Transaction:
         self.recipient = recipient
         self.quantity = quantity
 
+    #function used for debugging purposes
     def toString(self):
         return str(self.sender) + " -> " + str(self.recipient) + " $" + str(self.quantity)

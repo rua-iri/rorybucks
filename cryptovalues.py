@@ -1,3 +1,4 @@
+import time
 import requests
 import datetime
 import json
@@ -30,4 +31,22 @@ def getCryptoValues(apiKey):
     return dateValue
 
 
+# function to get current price of currency 
+# and whether it is currently up or down
+def getPriceNow():
+    nowStamp = int(time.time())
+    secondsInDay = 60 * 60 * 24
+    yesterdayStamp = nowStamp - secondsInDay
+
+    # concatenate elements to generate the url
+    url = "https://api.coingecko.com/api/v3/coins/squid-game/market_chart/range?vs_currency=usd"
+    url += "&from=" + str(yesterdayStamp)
+    url += "&to=" + str(nowStamp)
+
+    res = requests.get(url)
+
+    priceData = json.loads(res.text)
+
+    # return the price now and 24 hours ago
+    return [priceData["prices"][0], priceData["prices"][-1]]
 

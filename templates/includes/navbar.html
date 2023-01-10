@@ -8,6 +8,21 @@
 
         <ul class="navbar-nav my-2 my-lg-0">
 
+            {% if session.get("loggedIn") %}
+            <button class="nav-item btn btn-success mx-3">
+                <a href="/dashboard" class="nav-link fw-bold text-white">
+                    Dashboard
+                </a>
+            </button>
+
+            <button class="nav-item btn btn-danger mx-3">
+                <a href="/logout" class="nav-link fw-bold text-white">
+                    Logout
+                </a>
+            </button>
+
+
+            {% else %}
             <button class="nav-item btn btn-success mx-3">
                 <a href="/login" class="nav-link fw-bold text-white">
                     Login
@@ -19,6 +34,7 @@
                     Register
                 </a>
             </button>
+            {% endif %}
 
         </ul>
     </div>

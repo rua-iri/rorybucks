@@ -119,14 +119,22 @@ def logout():
 @app.route("/dashboard")
 @isLoggedIn
 def dashboard():
-    return flask.render_template("dashboard.html", session=flask.session)
+    balance = sqlhelpers.getBalance(flask.session.get("username"))
+
+    return flask.render_template("dashboard.html", session=flask.session, balance=balance)
 
 
 
 
 @app.route("/")
 def index():
-    return flask.render_template("index.html")
+    cryptoData = cryptovalues.getCryptoValues(secretstuff.SecretStuff.headers)
+
+    labels = [row[0] for row in cryptoData]
+    values = [row[1] for row in cryptoData]
+
+    return flask.render_template("index.html", labels=labels, values=values)
+
 
 
 @app.route("/transaction")
@@ -146,7 +154,6 @@ def transaction():
         
         return flask.redirect(flask.url_for("transaction"))
 
-
     return flask.render_template("transaction.html", balance=balance, form=form)
 
 
@@ -157,7 +164,4 @@ if __name__=="__main__":
 
 
 
-@app.route("/test")
-def test():
-    cryptovalues.getCryptoValues(secretstuff.SecretStuff.headers)
-    
+

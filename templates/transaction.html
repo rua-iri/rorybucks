@@ -17,29 +17,44 @@
 
         {% include "includes/navbar.html" %}
 
-        
-
         {% include "includes/_messages.html" %}
-        <p>Your Current Balance is {{ balance }} RoryBucks</p>
-        {% from "includes/_formhelpers.html" import render_field %}
 
-        <form action="" method="POST">
-            <div>
-                {{render_field(form.username)}}
-            </div>
+        <div class="card my-3 border-success">
+            <p class="fs-3">
+                $$$
+                Your Current Balance is {{ balance }} RoryBucks
+                {% from "includes/_formhelpers.html" import render_field %}
+                $$$
+            </p>
+        </div>
 
-            <div>
-                {{render_field(form.amount)}}
-            </div>
+        <div class="card my-4">
+            <form action="" method="POST">
+                <div class="card-body">
 
-            <div>
-                <input type="submit">
-            </div>
+                    <div class="card-title">
+                        <p class="fs-5">
+                            Send RoryBucks to another user
+                        </p>
+                    </div>
 
-        </form>
+                    <div class="form-group">
+                        {{render_field(form.username, class_="form-control")}}
+                    </div>
 
-        <button onclick="window.location.href='/dashboard'">
-            Dashboard
+                    <div class="form-group">
+                        {{render_field(form.amount, class_="form-control")}}
+                    </div>
+
+                    <div class="my-3">
+                        <input class="btn btn-success" type="submit">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <button class="btn btn-success my-5" onclick="window.location.href='/dashboard'">
+            Return to Dashboard
         </button>
 
     </div>

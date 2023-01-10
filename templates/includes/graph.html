@@ -8,8 +8,10 @@
 
     <canvas id="cryptochart"></canvas>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
-        var ctx = document.getElementById("cryptochart").getContext("2d");
+        var ctx = document.getElementById("cryptochart");
         var lineChart = new Chart(
             ctx,
             {
@@ -25,7 +27,7 @@
                             lineTension: 0.1
                         }
                     ]
-                },
+                }, 
                 options: {
                     responsive: false
                 }
